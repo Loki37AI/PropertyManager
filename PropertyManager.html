@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PropManager">
+<meta name="theme-color" content="#0d1117">
+<title>🏢 PropertyManager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh}
+input,button,select,textarea{font-family:inherit}
+#topbar{background:#161b22;border-bottom:1px solid #21262d;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:8px}
+#topbar h1{font-size:.95rem;font-weight:700}
+#topbar h1 b{color:#58a6ff}
+#sv{font-size:.68rem;color:#3fb950;opacity:0;transition:.3s;white-space:nowrap}
+#sv.on{opacity:1}
+input[type=month]{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:5px 9px;color:#e6edf3;font-size:.78rem;outline:none;color-scheme:dark}
+#tabs{background:#161b22;border-bottom:1px solid #21262d;display:flex;overflow-x:auto}
+.tab{flex:1;border:none;background:none;color:#8b949e;font-family:inherit;font-size:.7rem;font-weight:500;padding:9px 4px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;min-width:60px}
+.tab.on{color:#58a6ff;font-weight:700;border-bottom-color:#58a6ff}
+.tab span{display:block;font-size:.95rem;margin-bottom:2px}
+#content{padding:14px 12px 100px;max-width:900px;margin:0 auto}
+.pg{display:none}.pg.on{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:7px 13px;border:none;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;outline:none;white-space:nowrap}
+.btn:active{opacity:.7}
+.b-blue{background:#1f6feb;color:#fff}
+.b-green{background:#238636;color:#fff}
+.b-orange{background:#d29922;color:#fff}
+.b-red{background:rgba(248,81,73,.12);color:#f85149;border:1px solid rgba(248,81,73,.2)}
+.b-ghost{background:transparent;color:#8b949e;border:1px solid #30363d}
+.b-sm{font-size:.7rem;padding:4px 9px}
+.abar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.bcard{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.bhdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0d1117;cursor:pointer;user-select:none}
+.bnum{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
+.chev{color:#484f58;font-size:.7rem;display:inline-block;transition:.2s}
+.cls .chev{transform:rotate(-90deg)}
+.cls .cbody{display:none}
+.cbody{padding:12px}
+.rcard{border:1px solid #30363d;border-radius:9px;margin-bottom:10px;overflow:hidden;background:#0d1117}
+.rhdr{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#161b22;flex-wrap:wrap;gap:6px}
+.bsum{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 12px;border-bottom:1px solid #21262d}
+.bsi{background:#0d1117;border-radius:7px;padding:7px 9px;text-align:center}
+.bsi .bl{font-size:.58rem;color:#484f58;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.bsi .bv{font-size:.88rem;font-weight:700}
+.mtbl{width:100%;border-collapse:collapse;font-size:.73rem}
+.mtbl th{background:rgba(255,255,255,.03);color:#8b949e;padding:5px 7px;text-align:center;font-size:.58rem;text-transform:uppercase;font-weight:700}
+.mtbl th:first-child{text-align:left;padding-left:11px}
+.mtbl td{padding:6px 7px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle}
+.mtbl td:first-child{text-align:left;padding-left:11px}
+.mtbl input[type=number]{width:68px;background:#161b22;border:1px solid #30363d;border-radius:5px;padding:4px 5px;color:#e6edf3;font-size:.73rem;text-align:center;outline:none}
+.mtbl input:focus{border-color:#58a6ff}
+.dv{font-weight:700;color:#3fb950}.bv2{font-weight:700;color:#58a6ff}.zv{color:#484f58}.ev{color:#f85149;font-size:.68rem}
+.trow td{background:rgba(88,166,255,.06)!important;font-weight:700;border-top:1px solid rgba(88,166,255,.15)!important}
+.amrow{display:flex;gap:5px;padding:7px 12px;background:rgba(255,255,255,.02);border-top:1px dashed #21262d;flex-wrap:wrap;align-items:center}
+.amrow input{background:#0d1117;border:1px solid #30363d;border-radius:5px;padding:4px 7px;color:#e6edf3;font-size:.72rem;outline:none}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid #21262d;flex-wrap:wrap;gap:6px}
+.pbtn{border:none;border-radius:6px;padding:5px 11px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.pbtn.rp{background:rgba(63,185,80,.15);color:#3fb950;border:1px solid rgba(63,185,80,.3)}
+.pbtn.ru{background:rgba(248,81,73,.1);color:#f85149;border:1px solid rgba(248,81,73,.2)}
+.pbtn.wp{background:rgba(88,166,255,.15);color:#58a6ff;border:1px solid rgba(88,166,255,.3)}
+.pbtn.wu{background:rgba(248,81,73,.1);color:#f85149;border:1px solid rgba(248,81,73,.2)}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:14px}
+.ov.on{display:flex!important}
+.mbox{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;animation:pop .18s ease}
+@keyframes pop{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
+.mbox h3{font-size:.95rem;font-weight:700;margin-bottom:14px}
+.frow{margin-bottom:11px}
+.frow label{display:block;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;margin-bottom:4px}
+.frow input,.frow select{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:8px 11px;color:#e6edf3;font-size:.86rem;outline:none}
+.frow input:focus{border-color:#58a6ff}
+.macts{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.ocard{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:9px;overflow:hidden}
+.ohdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;flex-wrap:wrap;gap:8px}
+.oav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+.obody{padding:12px 14px;border-top:1px solid #21262d}
+.otbl{width:100%;border-collapse:collapse;font-size:.73rem}
+.otbl th{background:#0d1117;color:#8b949e;padding:6px 8px;text-align:left;font-size:.6rem;text-transform:uppercase;font-weight:700;border-bottom:1px solid #21262d}
+.otbl td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.badge{display:inline-flex;align-items:center;font-size:.66rem;font-weight:700;border-radius:5px;padding:2px 8px;cursor:pointer;border:none;font-family:inherit}
+.badge.paid{background:rgba(63,185,80,.12);color:#3fb950}
+.badge.unpaid{background:rgba(248,81,73,.12);color:#f85149}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:9px;margin-bottom:14px}
+.sc{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px}
+.dep{background:rgba(110,64,201,.08);border:1px solid rgba(110,64,201,.25);border-radius:8px;padding:9px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.toast-el{position:fixed;bottom:75px;left:50%;transform:translateX(-50%) translateY(10px);background:#161b22;border:1px solid #30363d;border-radius:9px;padding:9px 18px;font-size:.78rem;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.6);transition:.25s;opacity:0;pointer-events:none}
+.toast-el.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:480px){.bsum{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <h1>🏢 Property<b>Manager</b></h1>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="sv">✅ Saved</span>
+    <input type="month" id="MP" onchange="onMC(this.value)">
+  </div>
+</div>
+<div id="tabs">
+  <button class="tab on" onclick="go('b')" id="tab-b"><span>🏢</span>Billing</button>
+  <button class="tab" onclick="go('o')" id="tab-o"><span>💰</span>Outstanding</button>
+  <button class="tab" onclick="go('t')" id="tab-t"><span>👤</span>Tenants</button>
+  <button class="tab" onclick="go('s')" id="tab-s"><span>📊</span>Dashboard</button>
+</div>
+<div id="content">
+<div class="pg on" id="pg-b">
+  <div class="abar">
+    <button class="btn b-blue" onclick="OM('mAB')">＋ Building</button>
+    <button class="btn b-ghost" onclick="copyLast()" style="font-size:.72rem">⬅ Last Month</button>
+    <button class="btn b-green" onclick="doXL()">📊 Excel</button>
+    <button class="btn b-orange" onclick="doPDF()">📄 PDF</button>
+  </div>
+  <div id="BL"></div>
+</div>
+<div class="pg" id="pg-o">
+  <div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:3px">💰 Outstanding Balances</div><div style="font-size:.72rem;color:#8b949e">All unpaid rent + water across all months</div></div>
+  <div class="sgrid" id="OS"></div>
+  <div id="OL"></div>
+</div>
+<div class="pg" id="pg-t">
+  <div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:3px">👤 Tenant Details</div></div>
+  <input type="text" id="TS" placeholder="🔍 Search…" oninput="renT()" style="width:100%;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:8px 12px;color:#e6edf3;font-size:.78rem;outline:none;margin-bottom:12px">
+  <div id="TL"></div>
+</div>
+<div class="pg" id="pg-s">
+  <div style="font-weight:700;margin-bottom:12px" id="dTitle">📊 Dashboard</div>
+  <div class="sgrid" id="dStats"></div>
+  <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:13px;margin-bottom:11px">
+    <div style="font-size:.8rem;font-weight:700;margin-bottom:11px">💰 Monthly Trend</div>
+    <div style="display:flex;align-items:flex-end;gap:5px;height:90px;padding-bottom:16px" id="dChart"></div>
+  </div>
+</div>
+</div>
+
+<div class="ov" id="mAB"><div class="mbox">
+  <h3>🏢 Add Building</h3>
+  <div class="frow"><label>Building Name</label><input type="text" id="ABN" placeholder="e.g. Block A"></div>
+  <div class="macts"><button class="btn b-ghost" onclick="CM('mAB')">Cancel</button><button class="btn b-blue" onclick="addB()">Add</button></div>
+</div></div>
+<div class="ov" id="mAR"><div class="mbox">
+  <h3>🏠 Add Room</h3>
+  <input type="hidden" id="ARb">
+  <div class="frow"><label>Room Number</label><input type="text" id="ARN" placeholder="e.g. 101"></div>
+  <div class="frow"><label>Tenant Name</label><input type="text" id="ART" placeholder="e.g. Ravi Kumar"></div>
+  <div class="frow"><label>Monthly Rent (₹)</label><input type="number" id="ARR" placeholder="e.g. 5000"></div>
+  <div class="frow"><label>Security Deposit (₹)</label><input type="number" id="ARD" placeholder="e.g. 10000"></div>
+  <div class="frow"><label>Move-in Date</label><input type="date" id="ARMi"></div>
+  <div class="macts"><button class="btn b-ghost" onclick="CM('mAR')">Cancel</button><button class="btn b-blue" onclick="addR()">Add Room</button></div>
+</div></div>
+<div class="ov" id="mER"><div class="mbox">
+  <h3>✏️ Edit Room</h3>
+  <input type="hidden" id="ERb"><input type="hidden" id="ERr">
+  <div class="frow"><label>Room Number</label><input type="text" id="ERN"></div>
+  <div class="frow"><label>Tenant Name</label><input type="text" id="ERT"></div>
+  <div class="frow"><label>Monthly Rent (₹)</label><input type="number" id="ERR"></div>
+  <div class="frow"><label>Security Deposit (₹)</label><input type="number" id="ERD"></div>
+  <div class="frow"><label>Move-in Date</label><input type="date" id="ERMi"></div>
+  <div class="macts"><button class="btn b-ghost" onclick="CM('mER')">Cancel</button><button class="btn b-blue" onclick="saveER()">Save</button></div>
+</div></div>
+<div class="ov" id="mRB"><div class="mbox">
+  <h3>✏️ Rename Building</h3>
+  <input type="hidden" id="RBi">
+  <div class="frow"><label>Name</label><input type="text" id="RBN"></div>
+  <div class="macts"><button class="btn b-ghost" onclick="CM('mRB')">Cancel</button><button class="btn b-blue" onclick="saveRB()">Save</button></div>
+</div></div>
+<div class="toast-el" id="TT"></div>
+
+<script>
+var S={buildings:[]},PAY={},lastM=null,FDB=null;
+var PAL=['#58a6ff','#3fb950','#d29922','#a78bfa','#f85149','#ffd166'];
+var BC=[{bg:'rgba(88,166,255,.15)',tx:'#58a6ff'},{bg:'rgba(63,185,80,.15)',tx:'#3fb950'},{bg:'rgba(210,153,34,.15)',tx:'#d29922'},{bg:'rgba(167,139,250,.15)',tx:'#a78bfa'},{bg:'rgba(248,81,73,.15)',tx:'#f85149'}];
+var MOS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function uid(){return'_'+Math.random().toString(36).substr(2,9);}
+function ge(id){return document.getElementById(id);}
+function fmt(m){if(!m)return'';var p=m.split('-');return MOS[+p[1]-1]+' '+p[0];}
+function fmtS(m){if(!m)return'';var p=m.split('-');return MOS[+p[1]-1].slice(0,3)+' '+p[0].slice(2);}
+function curM(){return ge('MP').value;}
+function toast(msg){var t=ge('TT');t.textContent=msg;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3000);}
+function saved(msg){var t=ge('sv');t.textContent=msg||'✅ Saved';t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2500);}
+function OM(id){ge(id).classList.add('on');}
+function CM(id){ge(id).classList.remove('on');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('ov'))e.target.classList.remove('on');});
+function go(p){
+  ['b','o','t','s'].forEach(function(x){var pg=ge('pg-'+x),tb=ge('tab-'+x);if(pg)pg.classList.toggle('on',x===p);if(tb)tb.classList.toggle('on',x===p);});
+  if(p==='o')renO();if(p==='t')renT();if(p==='s')renD();
+}
+function onMC(v){if(lastM)save(lastM);lastM=v;localStorage.setItem('pm_month',v);load(v);setTimeout(function(){autoFill(v);},200);toast('📅 '+fmt(v));}
+function mB(m){var d=Math.max(0,(+m.curr||0)-(+m.last||0));return d*(+m.rate||0);}
+function wB(r){return r.meters.reduce(function(s,m){return s+mB(m);},0);}
+function rR(r){return+(r.rent||0);}
+function rT(r){return rR(r)+wB(r);}
+function bT(b){return b.rooms.reduce(function(s,r){return s+rT(r);},0);}
+function gPS(rid,m){return PAY[rid]&&PAY[rid][m]?PAY[rid][m]:{rent:'unpaid',water:'unpaid'};}
+function isRP(rid,m){return gPS(rid,m).rent==='paid';}
+function isWP(rid,m){return gPS(rid,m).water==='paid';}
+function sPS(rid,m,f,v){if(!PAY[rid])PAY[rid]={};if(!PAY[rid][m])PAY[rid][m]={rent:'unpaid',water:'unpaid'};PAY[rid][m][f]=v;save(m);var c=document.querySelector('.pg.on');if(c&&c.id==='pg-o')renO();}
+function togRP(rid,m){var n=isRP(rid,m);sPS(rid,m,'rent',n?'unpaid':'paid');toast(n?'Rent unpaid':'✅ Rent paid!');renB();}
+function togWP(rid,m){var n=isWP(rid,m);sPS(rid,m,'water',n?'unpaid':'paid');toast(n?'Water unpaid':'✅ Water paid!');renB();}
+
+// ── SAVE / LOAD ──────────────────────────────────
+function save(m){
+  if(!m)return;
+  try{
+    localStorage.setItem('pm_s',JSON.stringify(S));
+    localStorage.setItem('pm_p',JSON.stringify(PAY));
+    localStorage.setItem('pm_month',m);
+    var rd={};
+    S.buildings.forEach(function(b){b.rooms.forEach(function(r){r.meters.forEach(function(mt){if(!rd[r.id])rd[r.id]={};rd[r.id][mt.id]={last:mt.last||'',curr:mt.curr||''};});});});
+    localStorage.setItem('pm_r_'+m,JSON.stringify(rd));
+    localStorage.setItem('pm_ts',Date.now().toString());
+    saved('✅ Saved');
+    // Push to Firebase
+    if(FDB) pushFB();
+  }catch(e){}
+}
+function load(m){
+  try{var st=localStorage.getItem('pm_s');if(st)S=JSON.parse(st);}catch(e){}
+  try{var py=localStorage.getItem('pm_p');if(py)PAY=JSON.parse(py);}catch(e){}
+  try{
+    var rd=localStorage.getItem('pm_r_'+m);
+    if(rd){var r=JSON.parse(rd);S.buildings.forEach(function(b){b.rooms.forEach(function(rm){rm.meters.forEach(function(mt){var x=r[rm.id]&&r[rm.id][mt.id];mt.last=x?x.last:'';mt.curr=x?x.curr:'';});});});}
+    else{S.buildings.forEach(function(b){b.rooms.forEach(function(r){r.meters.forEach(function(mt){mt.last='';mt.curr='';});});});}
+  }catch(e){}
+  renB();
+}
+function esave(){try{save(ge('MP').value||lastM);}catch(e){}}
+window.addEventListener('beforeunload',esave);
+window.addEventListener('pagehide',esave);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')esave();});
+setInterval(esave,8000);
+
+// ── FIREBASE SYNC ────────────────────────────────
+function initFB(){
+  function lj(src,cb){var s=document.createElement('script');s.src=src;s.async=true;s.onload=cb;s.onerror=function(){};document.head.appendChild(s);}
+  lj('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',function(){
+    lj('https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js',function(){
+      try{
+        if(!firebase.apps.length){
+          firebase.initializeApp({
+            apiKey:"AIzaSyCm3Pi7ipBCMykrB3mxcUYoCWxFnlSZgSU",
+            authDomain:"monumental-semolina-215edd.firebaseapp.com",
+            databaseURL:"https://monumental-semolina-215edd-default-rtdb.firebaseio.com",
+            projectId:"monumental-semolina-215edd",
+            storageBucket:"monumental-semolina-215edd.appspot.com",
+            messagingSenderId:"447104436677",
+            appId:"1:447104436677:web:f63510d825512a9496a3ac"
+          });
+        }
+        FDB=firebase.database();
+        // Get my device ID
+        var myId=localStorage.getItem('pm_did');
+        if(!myId){myId='d_'+Math.random().toString(36).substr(2,9);localStorage.setItem('pm_did',myId);}
+
+        // PULL on open - always load latest from cloud
+        FDB.ref('pm3').once('value',function(snap){
+          var v=snap.val();
+          if(!v||!v.s){
+            // No cloud data yet - push my local data
+            if(S.buildings.length>0) pushFB();
+            return;
+          }
+          // Cloud has data - always use it (it's the source of truth)
+          applyCloud(v);
+          saved('☁️ Synced');
+        });
+
+        // LIVE listener - updates from other device
+        FDB.ref('pm3/ts').on('value',function(snap){
+          var cts=snap.val();if(!cts)return;
+          var lts=parseInt(localStorage.getItem('pm_ts')||'0');
+          var myId2=localStorage.getItem('pm_did');
+          // Only pull if newer AND from different device
+          if(cts>lts+2000){
+            FDB.ref('pm3').once('value',function(snap2){
+              var v=snap2.val();
+              if(!v||!v.s)return;
+              if(v.did===myId2)return; // my own save, ignore
+              applyCloud(v);
+              toast('🔄 Brother updated data!');
+            });
+          }
+        });
+        saved('☁️ Connected');
+      }catch(e){}
+    });
+  });
+}
+
+function applyCloud(v){
+  try{S=JSON.parse(v.s);}catch(e){return;}
+  try{if(v.p)PAY=JSON.parse(v.p);}catch(e){}
+  if(v.month){localStorage.setItem('pm_month',v.month);ge('MP').value=v.month;lastM=v.month;}
+  // Restore all monthly readings
+  if(v.rd){Object.keys(v.rd).forEach(function(k){localStorage.setItem('pm_r_'+k,v.rd[k]);});}
+  localStorage.setItem('pm_s',v.s);
+  if(v.p)localStorage.setItem('pm_p',v.p);
+  localStorage.setItem('pm_ts',v.ts||Date.now());
+  load(ge('MP').value);
+}
+
+function pushFB(){
+  if(!FDB)return;
+  var myId=localStorage.getItem('pm_did')||'unknown';
+  var rd={};
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(k&&k.startsWith('pm_r_'))rd[k.replace('pm_r_','')]=localStorage.getItem(k);
+  }
+  var payload={
+    did:myId,
+    ts:Date.now(),
+    s:JSON.stringify(S),
+    p:JSON.stringify(PAY),
+    month:ge('MP').value,
+    rd:rd
+  };
+  FDB.ref('pm3').set(payload).catch(function(){});
+}
+
+// ── MUTATIONS ────────────────────────────────────
+function addB(){var n=ge('ABN').value.trim();if(!n){alert('Enter name');return;}S.buildings.push({id:uid(),name:n,rooms:[]});ge('ABN').value='';CM('mAB');renB();save(curM());toast('🏢 "'+n+'" added!');}
+function oAR(bid){ge('ARb').value=bid;ge('ARN').value='';ge('ART').value='';ge('ARR').value='';ge('ARD').value='';ge('ARMi').value='';OM('mAR');}
+function addR(){var bid=ge('ARb').value,n=ge('ARN').value.trim();if(!n){alert('Enter room number');return;}var b=S.buildings.find(function(x){return x.id===bid;});if(!b)return;b.rooms.push({id:uid(),name:n,tenant:ge('ART').value.trim(),rent:+ge('ARR').value||0,deposit:+ge('ARD').value||0,moveIn:ge('ARMi').value,meters:[]});ge('ARN').value='';ge('ART').value='';ge('ARR').value='';ge('ARD').value='';ge('ARMi').value='';CM('mAR');renB();save(curM());toast('🏠 Room added!');}
+function oER(bid,rid){var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});if(!r)return;ge('ERb').value=bid;ge('ERr').value=rid;ge('ERN').value=r.name;ge('ERT').value=r.tenant||'';ge('ERR').value=r.rent||'';ge('ERD').value=r.deposit||'';ge('ERMi').value=r.moveIn||'';OM('mER');}
+function saveER(){var bid=ge('ERb').value,rid=ge('ERr').value;var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});if(!r)return;r.name=ge('ERN').value.trim();r.tenant=ge('ERT').value.trim();r.rent=+ge('ERR').value||0;r.deposit=+ge('ERD').value||0;r.moveIn=ge('ERMi').value;CM('mER');renB();save(curM());toast('✅ Updated!');}
+function addM(bid,rid){var n=ge('MN-'+rid).value.trim(),u=ge('MU-'+rid).value.trim(),ra=parseFloat(ge('MR-'+rid).value)||0;if(!n){alert('Enter meter name');return;}var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});if(!r)return;r.meters.push({id:uid(),name:n,unit:u||'units',rate:ra,last:'',curr:''});renB();save(curM());toast(n+' added!');}
+function delM(bid,rid,mid){var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});if(!r)return;r.meters=r.meters.filter(function(m){return m.id!==mid;});renB();save(curM());}
+function delR(bid,rid){if(!confirm('Delete room?'))return;var b=S.buildings.find(function(x){return x.id===bid;});b.rooms=b.rooms.filter(function(r){return r.id!==rid;});renB();save(curM());}
+function delB(bid){if(!confirm('Delete building?'))return;S.buildings=S.buildings.filter(function(b){return b.id!==bid;});renB();save(curM());}
+function oRB(bid){var b=S.buildings.find(function(x){return x.id===bid;});ge('RBi').value=bid;ge('RBN').value=b.name;OM('mRB');}
+function saveRB(){var bid=ge('RBi').value,n=ge('RBN').value.trim();if(!n)return;var b=S.buildings.find(function(x){return x.id===bid;});if(b)b.name=n;CM('mRB');renB();save(curM());}
+function updR(bid,rid,mid,f,v){var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});var m=r&&r.meters.find(function(x){return x.id===mid;});if(!m)return;m[f]=v;var lv=+m.last||0,cv=+m.curr||0,diff=cv-lv,bill=diff>0?(diff*(+m.rate||0)).toFixed(2):null;var dc=ge('DC-'+mid),bc=ge('BC-'+mid);if(dc&&bc){if(diff<0){dc.innerHTML='<span class="ev">'+diff+'⚠</span>';bc.innerHTML='<span class="ev">Err</span>';}else{dc.innerHTML='<span class="dv">'+diff+' '+m.unit+'</span>';bc.innerHTML=bill?'<span class="bv2">₹'+bill+'</span>':'<span class="zv">—</span>';}}var wb=wB(r),tot=rR(r)+wb;var wt=ge('WB-'+rid);if(wt)wt.textContent='₹'+wb.toFixed(2);var tt=ge('TB-'+rid);if(tt)tt.textContent='₹'+tot.toFixed(2);var rt=ge('RT-'+rid);if(rt)rt.textContent=tot>0?'₹'+tot.toFixed(2):'—';save(curM());}
+function getPK(m){var p=m.split('-').map(Number);var pm=p[1]===1?12:p[1]-1,py=p[1]===1?p[0]-1:p[0];return py+'-'+String(pm).padStart(2,'0');}
+function copyLast(){var m=curM();if(!m){toast('Select month');return;}var rd=localStorage.getItem('pm_r_'+getPK(m));if(rd){try{var pr=JSON.parse(rd);S.buildings.forEach(function(b){b.rooms.forEach(function(r){r.meters.forEach(function(mt){var x=pr[r.id]&&pr[r.id][mt.id];mt.last=x?(x.curr||x.last||''):'';mt.curr='';});});});renB();save(m);toast('✅ Last month loaded!');}catch(e){}}else toast('⚠️ No previous month data');}
+function autoFill(m){var rd=localStorage.getItem('pm_r_'+m);if(rd)return;var pr=localStorage.getItem('pm_r_'+getPK(m));if(!pr)return;try{var p=JSON.parse(pr);if(!Object.keys(p).length)return;S.buildings.forEach(function(b){b.rooms.forEach(function(r){r.meters.forEach(function(mt){var x=p[r.id]&&p[r.id][mt.id];mt.last=x?(x.curr||''):'';mt.curr='';});});});renB();save(m);toast('✅ Last month auto-loaded!');}catch(e){}}
+function tc(id){var el=ge(id);if(el)el.classList.toggle('cls');}
+
+// ── RENDER ───────────────────────────────────────
+function renB(){
+  var el=ge('BL'),m=curM();
+  if(!S.buildings.length){el.innerHTML='<div style="text-align:center;padding:50px 20px;color:#484f58"><div style="font-size:2.5rem;margin-bottom:12px">🏢</div><div style="font-weight:600;font-size:1rem;color:#8b949e;margin-bottom:6px">No buildings yet</div><div style="font-size:.82rem">Tap <b style="color:#58a6ff">＋ Building</b> above</div></div>';return;}
+  el.innerHTML='';
+  S.buildings.forEach(function(b,bi){
+    var c=BC[bi%BC.length],bt=bT(b);
+    var div=document.createElement('div');div.className='bcard';div.id='BC-'+b.id;
+    div.innerHTML='<div class="bhdr" onclick="tc(\'BC-\'+ \''+b.id+'\')">'+'<div style="display:flex;align-items:center;gap:9px"><div class="bnum" style="background:'+c.bg+';color:'+c.tx+'">'+(bi+1)+'</div><div><div style="font-weight:700;font-size:.9rem">'+b.name+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:1px">'+b.rooms.length+' room'+(b.rooms.length!==1?'s':'')+'</div></div></div><div style="display:flex;align-items:center;gap:9px"><div style="font-weight:700;color:#3fb950">'+(bt>0?'₹'+bt.toFixed(2):'—')+'</div><span class="chev">▼</span></div></div>'+'<div class="cbody"><div id="RL-'+b.id+'"></div><div class="abar" style="margin-top:8px;margin-bottom:0"><button class="btn b-blue b-sm" onclick="oAR(\''+b.id+'\')">＋ Room</button><button class="btn b-ghost b-sm" onclick="oRB(\''+b.id+'\')">✏️ Rename</button><button class="btn b-red b-sm" onclick="delB(\''+b.id+'\')">🗑</button></div></div>';
+    el.appendChild(div);
+    var rl=ge('RL-'+b.id);
+    b.rooms.forEach(function(r){rl.appendChild(mkR(b,r,m));});
+  });
+}
+function mkR(b,r,m){
+  var wb=wB(r),rr=rR(r),tot=rr+wb,ps=gPS(r.id,m),rP=ps.rent==='paid',wP=ps.water==='paid';
+  var div=document.createElement('div');div.className='rcard';
+  var rows=r.meters.map(function(mt,i){var lv=+mt.last||0,cv=+mt.curr||0,diff=cv-lv,bill=diff>0?(diff*(+mt.rate||0)).toFixed(2):null,dot=PAL[i%PAL.length];var dc=diff<0?'<span class="ev">'+diff+'⚠</span>':(mt.curr!==''?'<span class="dv">'+diff+' '+mt.unit+'</span>':'<span class="zv">—</span>');var bc=diff<0?'<span class="ev">Err</span>':(bill?'<span class="bv2">₹'+bill+'</span>':'<span class="zv">—</span>');return'<tr><td><div style="display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:50%;background:'+dot+';flex-shrink:0"></div><div style="font-weight:600">'+mt.name+'</div></div></td><td><input type="number" value="'+(mt.last||'')+'" placeholder="0" min="0" oninput="updR(\''+b.id+'\',\''+r.id+'\',\''+mt.id+'\',\'last\',this.value)"></td><td><input type="number" value="'+(mt.curr||'')+'" placeholder="0" min="0" oninput="updR(\''+b.id+'\',\''+r.id+'\',\''+mt.id+'\',\'curr\',this.value)"></td><td id="DC-'+mt.id+'">'+dc+'</td><td style="color:#8b949e;font-size:.7rem">₹'+mt.rate+'/'+mt.unit+'</td><td id="BC-'+mt.id+'">'+bc+'</td><td><button class="btn b-red" style="padding:2px 7px;font-size:.62rem" onclick="delM(\''+b.id+'\',\''+r.id+'\',\''+mt.id+'\')">✕</button></td></tr>';}).join('');
+  var tr=r.meters.length>1?'<tr class="trow"><td colspan="3" style="text-align:right;font-size:.64rem;color:#484f58;padding-right:9px">Water Total →</td><td colspan="2" style="color:#58a6ff;text-align:center">₹'+wb.toFixed(2)+'</td><td colspan="2"></td></tr>':'';
+  div.innerHTML='<div class="rhdr"><div><div style="font-weight:700;font-size:.88rem">🏠 Room '+r.name+'</div><div style="font-size:.7rem;color:#8b949e;margin-top:2px">'+(r.tenant?'<span style="color:#a78bfa">👤 '+r.tenant+'</span>':'<span style="color:#484f58">No tenant</span>')+(r.rent?' · <span style="color:#3fb950;font-weight:600">₹'+r.rent+'/mo</span>':'')+(r.deposit?' · <span style="color:#d29922">🔐 ₹'+r.deposit+'</span>':'')+'</div></div><div style="display:flex;align-items:center;gap:7px"><div id="RT-'+r.id+'" style="font-weight:700;color:#58a6ff;font-size:.9rem">'+(tot>0?'₹'+tot.toFixed(2):'—')+'</div><button class="btn b-ghost b-sm" onclick="oER(\''+b.id+'\',\''+r.id+'\')">✏️</button><button class="btn b-red b-sm" onclick="delR(\''+b.id+'\',\''+r.id+'\')">🗑</button></div></div>'+'<div class="bsum"><div class="bsi"><div class="bl">🏠 Rent</div><div class="bv" style="color:#3fb950">₹'+(rr>0?rr.toFixed(2):'0')+'</div></div><div class="bsi"><div class="bl">💧 Water</div><div class="bv" id="WB-'+r.id+'" style="color:#58a6ff">₹'+wb.toFixed(2)+'</div></div><div class="bsi" style="border:1px solid rgba(88,166,255,.2)"><div class="bl">💰 Total</div><div class="bv" id="TB-'+r.id+'" style="color:#e6edf3">₹'+tot.toFixed(2)+'</div></div><div class="bsi" style="border:1px solid '+(rP&&wP?'rgba(63,185,80,.2)':'rgba(248,81,73,.2)')+'"><div class="bl">Status</div><div class="bv" style="font-size:.76rem">'+(rP&&wP?'✅ Paid':'⚠️ Due')+'</div></div></div>'+(r.meters.length>0?'<div style="overflow-x:auto"><table class="mtbl"><thead><tr><th>Meter</th><th>Last Reading</th><th>Current Reading</th><th>Used</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody>'+rows+tr+'</tbody></table></div>':'')+'<div class="prow"><div style="font-size:.7rem;color:#8b949e">Payment — '+fmt(m)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pbtn '+(rP?'rp':'ru')+'" onclick="togRP(\''+r.id+'\',\''+m+'\')">🏠 Rent '+(rP?'✓':'✗')+'</button><button class="pbtn '+(wP?'wp':'wu')+'" onclick="togWP(\''+r.id+'\',\''+m+'\')">💧 Water '+(wP?'✓':'✗')+'</button><button class="btn b-orange b-sm" onclick="genB(\''+b.id+'\',\''+r.id+'\',\''+b.name+'\')">📄 Bill PDF</button></div></div>'+'<div class="amrow"><span style="font-size:.7rem;color:#8b949e;font-weight:600">＋ Meter:</span><input type="text" id="MN-'+r.id+'" placeholder="Water" style="width:88px"><input type="text" id="MU-'+r.id+'" placeholder="Litres" style="width:72px"><input type="number" id="MR-'+r.id+'" placeholder="Rate ₹" style="width:62px" step="0.01"><button class="btn b-blue b-sm" onclick="addM(\''+b.id+'\',\''+r.id+'\')">Add</button></div>';
+  return div;
+}
+function allMs(){var ms=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('pm_r_'))ms.push(k.replace('pm_r_',''));}return ms.sort();}
+function getMS(m){var st=localStorage.getItem('pm_s');if(!st)return null;var s;try{s=JSON.parse(st);}catch(e){return null;}var rd=localStorage.getItem('pm_r_'+m);if(rd){try{var r=JSON.parse(rd);s.buildings.forEach(function(b){b.rooms.forEach(function(rm){rm.meters.forEach(function(mt){var x=r[rm.id]&&r[rm.id][mt.id];mt.last=x?x.last:'';mt.curr=x?x.curr:'';});});});}catch(e){}}return s;}
+function renO(){
+  var ms=allMs(),rooms=[];S.buildings.forEach(function(b){b.rooms.forEach(function(r){rooms.push({b:b,r:r});});});
+  var tC=0,tD=0,tDep=0,entries=[];
+  rooms.forEach(function(item){var r=item.r,b=item.b,due=0,coll=0,hist=[];ms.forEach(function(m){var sv=getMS(m);if(!sv)return;var sb=sv.buildings.find(function(x){return x.id===b.id;});var sr=sb&&sb.rooms.find(function(x){return x.id===r.id;});if(!sr)return;var wb=sr.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);var rr=+(sr.rent||0),ps=gPS(r.id,m),rd=(ps.rent!=='paid'?rr:0)+(ps.water!=='paid'?wb:0),rc=(ps.rent==='paid'?rr:0)+(ps.water==='paid'?wb:0);if(rr>0||wb>0){hist.push({m:m,rent:rr,water:wb,total:rr+wb,rp:ps.rent==='paid',wp:ps.water==='paid',due:rd,coll:rc});due+=rd;coll+=rc;}});tC+=coll;tD+=due;tDep+=+(r.deposit||0);if(hist.length>0)entries.push({b:b,r:r,hist:hist,due:due,coll:coll});});
+  ge('OS').innerHTML='<div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">✅</div><div style="font-size:1.2rem;font-weight:700;color:#3fb950">₹'+tC.toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Collected</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">⚠️</div><div style="font-size:1.2rem;font-weight:700;color:#f85149">₹'+tD.toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Outstanding</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">🔐</div><div style="font-size:1.2rem;font-weight:700;color:#a78bfa">₹'+tDep.toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Deposits</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">🏠</div><div style="font-size:1.2rem;font-weight:700;color:#d29922">'+rooms.length+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Rooms</div></div>';
+  var cont=ge('OL');cont.innerHTML='';if(!entries.length){cont.innerHTML='<div style="text-align:center;padding:30px;color:#484f58">No billing history yet</div>';return;}entries.sort(function(a,b){return b.due-a.due;});
+  entries.forEach(function(e,i){var ac=PAL[i%PAL.length],um=e.hist.filter(function(h){return h.due>0;}).length;var card=document.createElement('div');card.className='ocard';var rows=e.hist.map(function(h){return'<tr><td><span style="background:rgba(88,166,255,.1);color:#58a6ff;border-radius:4px;padding:2px 6px;font-weight:700;font-size:.68rem">'+fmtS(h.m)+'</span></td><td style="text-align:right">₹'+h.rent.toFixed(2)+'</td><td style="text-align:right">₹'+h.water.toFixed(2)+'</td><td style="text-align:right;font-weight:700">₹'+h.total.toFixed(2)+'</td><td><button class="badge '+(h.rp?'paid':'unpaid')+'" onclick="togRP(\''+e.r.id+'\',\''+h.m+'\')">Rent '+(h.rp?'✓':'✗')+'</button></td><td><button class="badge '+(h.wp?'paid':'unpaid')+'" onclick="togWP(\''+e.r.id+'\',\''+h.m+'\')">Water '+(h.wp?'✓':'✗')+'</button></td><td style="text-align:right;font-weight:700;color:'+(h.due>0?'#f85149':'#3fb950')+'">'+(h.due>0?'₹'+h.due.toFixed(2):'✓')+'</td></tr>';}).join('');card.innerHTML='<div class="ohdr" onclick="tc(\'OC-'+e.r.id+'\')">'+'<div style="display:flex;align-items:center;gap:9px"><div class="oav" style="background:'+ac+'22;color:'+ac+'">'+e.r.name.slice(0,2).toUpperCase()+'</div><div><div style="font-weight:700;font-size:.88rem">Room '+e.r.name+'</div><div style="font-size:.66rem;color:#8b949e;margin-top:2px">'+(e.r.tenant?'<span style="color:#a78bfa">'+e.r.tenant+'</span> · ':'')+e.b.name+' · '+um+' month'+(um!==1?'s':'')+' unpaid</div></div></div>'+'<div style="text-align:right"><div style="font-weight:700;font-size:.95rem;color:'+(e.due>0?'#f85149':'#3fb950')+'">'+(e.due>0?'₹'+e.due.toFixed(2):'✅ Clear')+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:1px">₹'+e.coll.toFixed(2)+' collected</div>'+(e.r.deposit?'<div style="font-size:.65rem;color:#a78bfa;margin-top:1px">🔐 ₹'+e.r.deposit+' deposit</div>':'')+'<span class="chev">▼</span></div></div>'+'<div class="obody" id="OC-'+e.r.id+'" style="display:none">'+(e.r.deposit?'<div class="dep"><div><div style="font-size:.7rem;color:#a78bfa;font-weight:700">🔐 Security Deposit</div><div style="font-size:.65rem;color:#8b949e;margin-top:2px">'+(e.r.moveIn?'Move-in: '+e.r.moveIn:'')+'</div></div><div style="font-weight:700;color:#a78bfa;font-size:.95rem">₹'+e.r.deposit.toFixed(2)+'</div></div>':'')+'<div style="overflow-x:auto"><table class="otbl"><thead><tr><th>Month</th><th style="text-align:right">Rent</th><th style="text-align:right">Water</th><th style="text-align:right">Total</th><th>Rent</th><th>Water</th><th style="text-align:right">Due</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr style="background:rgba(88,166,255,.06);font-weight:700"><td>Total</td><td style="text-align:right">₹'+e.hist.reduce(function(s,h){return s+h.rent;},0).toFixed(2)+'</td><td style="text-align:right">₹'+e.hist.reduce(function(s,h){return s+h.water;},0).toFixed(2)+'</td><td style="text-align:right">₹'+e.hist.reduce(function(s,h){return s+h.total;},0).toFixed(2)+'</td><td colspan="2"></td><td style="text-align:right;color:'+(e.due>0?'#f85149':'#3fb950')+'">₹'+e.due.toFixed(2)+'</td></tr></tfoot></table></div></div>';cont.appendChild(card);});
+}
+function renT(){
+  var sv=(ge('TS')?ge('TS').value||'':'').toLowerCase(),rooms=[],ms=allMs(),cont=ge('TL');
+  S.buildings.forEach(function(b){b.rooms.forEach(function(r){rooms.push({b:b,r:r});});});
+  cont.innerHTML='';
+  var fl=rooms.filter(function(x){if(!sv)return true;return(x.r.name||'').toLowerCase().includes(sv)||(x.r.tenant||'').toLowerCase().includes(sv)||(x.b.name||'').toLowerCase().includes(sv);});
+  if(!fl.length){cont.innerHTML='<div style="text-align:center;padding:28px;color:#484f58">No tenants found</div>';return;}
+  fl.forEach(function(item,i){var r=item.r,b=item.b,ac=PAL[i%PAL.length],tD=0,tC=0;ms.forEach(function(m){var sv2=getMS(m);if(!sv2)return;var sb=sv2.buildings.find(function(x){return x.id===b.id;});var sr=sb&&sb.rooms.find(function(x){return x.id===r.id;});if(!sr)return;var wb=sr.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);var rr=+(sr.rent||0),ps=gPS(r.id,m);tD+=(ps.rent!=='paid'?rr:0)+(ps.water!=='paid'?wb:0);tC+=(ps.rent==='paid'?rr:0)+(ps.water==='paid'?wb:0);});var card=document.createElement('div');card.className='ocard';card.innerHTML='<div class="ohdr"><div style="display:flex;align-items:center;gap:9px"><div class="oav" style="background:'+ac+'22;color:'+ac+'">'+r.name.slice(0,2).toUpperCase()+'</div><div><div style="font-weight:700;font-size:.88rem">Room '+r.name+'</div><div style="font-size:.66rem;color:#8b949e;margin-top:2px">'+b.name+(r.moveIn?' · Since '+r.moveIn:'')+'</div></div></div><div style="text-align:right">'+(r.rent?'<div style="color:#3fb950;font-weight:700;font-size:.88rem">₹'+r.rent+'/mo</div>':'')+'</div></div><div style="padding:12px 14px;border-top:1px solid #21262d"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div class="bsi"><div class="bl">👤 Tenant</div><div style="font-size:.82rem;font-weight:700;color:#e6edf3">'+(r.tenant||'—')+'</div></div><div class="bsi"><div class="bl">🏠 Rent/mo</div><div style="font-size:.82rem;font-weight:700;color:#3fb950">₹'+(r.rent||0)+'</div></div><div class="bsi"><div class="bl">🔐 Deposit</div><div style="font-size:.82rem;font-weight:700;color:#a78bfa">₹'+(r.deposit||0)+'</div></div><div class="bsi"><div class="bl">📅 Move-in</div><div style="font-size:.78rem;font-weight:600;color:#8b949e">'+(r.moveIn||'—')+'</div></div><div class="bsi"><div class="bl">✅ Collected</div><div style="font-size:.82rem;font-weight:700;color:#3fb950">₹'+tC.toFixed(2)+'</div></div><div class="bsi"><div class="bl">⚠️ Outstanding</div><div style="font-size:.82rem;font-weight:700;color:'+(tD>0?'#f85149':'#3fb950')+'">₹'+tD.toFixed(2)+'</div></div></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn b-ghost b-sm" onclick="oER(\''+b.id+'\',\''+r.id+'\')">✏️ Edit</button><button class="btn b-orange b-sm" onclick="genB(\''+b.id+'\',\''+r.id+'\',\''+b.name+'\')">📄 Bill PDF</button></div></div>';cont.appendChild(card);});
+}
+function renD(){
+  var m=curM();ge('dTitle').textContent='📊 Dashboard — '+fmt(m);
+  var rooms=[];S.buildings.forEach(function(b){b.rooms.forEach(function(r){rooms.push({b:b,r:r});});});
+  var tR=rooms.reduce(function(s,x){return s+(+x.r.rent||0);},0);
+  var tW=rooms.reduce(function(s,x){return s+wB(x.r);},0);
+  var coll=0,due=0;
+  rooms.forEach(function(item){var r=item.r,ps=gPS(r.id,m);if(ps.rent==='paid')coll+=(+r.rent||0);else due+=(+r.rent||0);if(ps.water==='paid')coll+=wB(r);else due+=wB(r);});
+  ge('dStats').innerHTML='<div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">💰</div><div style="font-size:1.2rem;font-weight:700;color:#58a6ff">₹'+(tR+tW).toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Total Bill</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">✅</div><div style="font-size:1.2rem;font-weight:700;color:#3fb950">₹'+coll.toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Collected</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">⚠️</div><div style="font-size:1.2rem;font-weight:700;color:#f85149">₹'+due.toFixed(0)+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Pending</div></div><div class="sc"><div style="font-size:1.2rem;margin-bottom:6px">🏠</div><div style="font-size:1.2rem;font-weight:700;color:#d29922">'+rooms.length+'</div><div style="font-size:.65rem;color:#8b949e;margin-top:3px">Rooms</div></div>';
+  var ms=allMs().slice(-8),mxV=1;
+  var mdata=ms.map(function(mo){var sv=getMS(mo);if(!sv)return{l:fmtS(mo),v:0};var tot=sv.buildings.reduce(function(s,b){return s+b.rooms.reduce(function(s2,r){var wb=r.meters.reduce(function(s3,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s3+d*(+mt.rate||0);},0);return s2+(+r.rent||0)+wb;},0);},0);if(tot>mxV)mxV=tot;return{l:fmtS(mo),v:tot};});
+  ge('dChart').innerHTML=mdata.map(function(d,i){var h=Math.max(3,d.v/mxV*78);return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end"><div style="font-size:.54rem;color:#8b949e;font-weight:600">'+(d.v>999?(d.v/1000).toFixed(1)+'k':d.v.toFixed(0))+'</div><div style="width:100%;height:'+h+'px;background:'+PAL[i%PAL.length]+';border-radius:4px 4px 0 0"></div><div style="font-size:.54rem;color:#484f58;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">'+d.l+'</div></div>';}).join('');
+}
+function genB(bid,rid,bn){
+  var b=S.buildings.find(function(x){return x.id===bid;});var r=b&&b.rooms.find(function(x){return x.id===rid;});if(!r)return;
+  var m=curM(),ml=fmt(m),date=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  var inv='INV-'+rid.slice(1,6).toUpperCase()+'-'+m.replace('-','');
+  var wb=wB(r),rr=+(r.rent||0),tot=rr+wb,ps=gPS(r.id,m),rP=ps.rent==='paid',wP=ps.water==='paid',aP=rP&&wP;
+  var mR=r.meters.map(function(mt){var p=+mt.last||0,c=+mt.curr||0,d=Math.max(0,c-p),bl=d*(+mt.rate||0);return'<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:9px 12px;font-weight:600;font-size:12px">💧 '+mt.name+'</td><td style="text-align:center;padding:9px 6px;color:#475569;font-size:12px">'+p+'</td><td style="text-align:center;padding:9px 6px;color:#475569;font-size:12px">'+c+'</td><td style="text-align:center;padding:9px 6px;font-weight:700;color:#0f4c81;font-size:12px">'+d+' '+mt.unit+'</td><td style="text-align:center;padding:9px 6px;color:#64748b;font-size:11px">₹'+mt.rate+'/'+mt.unit+'</td><td style="text-align:right;padding:9px 12px;font-weight:700;color:#0f6b3a;font-size:13px">₹'+bl.toFixed(2)+'</td></tr>';}).join('');
+  var ms2=allMs(),oR='',tO=0;ms2.forEach(function(mo){if(mo===m)return;var sv=getMS(mo);if(!sv)return;var sb=sv.buildings.find(function(x){return x.id===bid;});var sr=sb&&sb.rooms.find(function(x){return x.id===rid;});if(!sr)return;var swb=sr.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);var srr=+(sr.rent||0),p2=gPS(r.id,mo);var d2=(p2.rent!=='paid'?srr:0)+(p2.water!=='paid'?swb:0);if(d2>0){tO+=d2;oR+='<tr style="border-bottom:1px solid #fee2e2"><td style="padding:6px 10px;font-size:11px">'+fmtS(mo)+'</td><td style="text-align:right;padding:6px 10px;font-size:11px">'+(p2.rent!=='paid'?'₹'+srr.toFixed(2):'<span style="color:#16a34a">✓</span>')+'</td><td style="text-align:right;padding:6px 10px;font-size:11px">'+(p2.water!=='paid'?'₹'+swb.toFixed(2):'<span style="color:#16a34a">✓</span>')+'</td><td style="text-align:right;padding:6px 10px;font-weight:700;color:#991b1b;font-size:12px">₹'+d2.toFixed(2)+'</td></tr>';}});
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill-Room '+r.name+'</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Segoe UI",Arial,sans-serif;background:#f8fafc}.page{max-width:480px;margin:0 auto;background:#fff}.hdr{background:linear-gradient(135deg,#0f2744,#1e4d8c);padding:22px 20px 16px;color:#fff}.sb{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:'+(aP?'#dcfce7':'#fef2f2')+';border-bottom:1px solid '+(aP?'#bbf7d0':'#fecaca')+'}.sp{font-weight:800;font-size:12px;color:'+(aP?'#166534':'#991b1b')+'}.sec{padding:12px 18px;border-bottom:1px solid #f1f5f9}.stl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:7px}.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ib{background:#f8fafc;border-radius:7px;padding:8px 10px;border:1px solid #e2e8f0}.il{font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:2px}.iv{font-size:12px;font-weight:700;color:#1e293b}.bx{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0}.bb{background:#fff;border-radius:8px;padding:10px;text-align:center;border:1px solid #e2e8f0}.bbl{font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-bottom:3px}.bbv{font-size:18px;font-weight:800}table{width:100%;border-collapse:collapse;border:1px solid #e2e8f0}th{background:#f1f5f9;padding:7px 6px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b}th:first-child{text-align:left;padding-left:12px}th:last-child{text-align:right;padding-right:12px}.tb{margin:12px 18px;background:linear-gradient(135deg,#0f2744,#1e4d8c);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff}.out{margin:0 18px 12px;background:#fff7f7;border:1px solid #fecaca;border-radius:8px;overflow:hidden}.ot{background:#fee2e2;padding:7px 11px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase}.ft{margin:12px 18px 20px;text-align:center;border-top:1px solid #f1f5f9;padding-top:9px;font-size:10px;color:#94a3b8}@media print{body{background:#fff}.page{max-width:100%}}</style></head><body><div class="page"><div class="hdr"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="font-size:17px;font-weight:800">🏢 Property<span style="color:#60a5fa">Manager</span></div><div style="background:rgba(255,255,255,.15);border-radius:5px;padding:2px 8px;font-size:9px;font-weight:700;color:#93c5fd">'+inv+'</div></div><div style="font-size:22px;font-weight:800;margin-bottom:3px">Room '+r.name+'</div><div style="font-size:11px;color:#93c5fd">'+bn+'</div></div><div class="sb"><div class="sp">'+(aP?'✅ FULLY PAID':'⚠️ PAYMENT PENDING')+'</div><div style="font-size:10px;color:#64748b">📅 '+date+'</div></div><div class="sec"><div class="stl">Tenant Info</div><div class="ig"><div class="ib"><div class="il">👤 Tenant</div><div class="iv">'+(r.tenant||'—')+'</div></div><div class="ib"><div class="il">📅 Period</div><div class="iv">'+ml+'</div></div><div class="ib"><div class="il">🏠 Monthly Rent</div><div class="iv" style="color:#16a34a">₹'+rr.toFixed(2)+'</div></div><div class="ib"><div class="il">🔐 Deposit</div><div class="iv" style="color:#7c3aed">₹'+(r.deposit||0)+'</div></div></div></div><div class="bx"><div class="bb"><div class="bbl">🏠 Rent</div><div class="bbv" style="color:'+(rP?'#16a34a':'#dc2626')+'">₹'+rr.toFixed(2)+'</div><div style="font-size:9px;margin-top:3px;color:'+(rP?'#16a34a':'#dc2626')+'">'+(rP?'✓ Paid':'✗ Unpaid')+'</div></div><div class="bb"><div class="bbl">💧 Water</div><div class="bbv" style="color:'+(wP?'#16a34a':'#dc2626')+'">₹'+wb.toFixed(2)+'</div><div style="font-size:9px;margin-top:3px;color:'+(wP?'#16a34a':'#dc2626')+'">'+(wP?'✓ Paid':'✗ Unpaid')+'</div></div></div>'+(r.meters.length>0?'<div class="sec"><div class="stl">💧 Water Meter Readings</div><table><thead><tr><th>Meter</th><th>Prev</th><th>Curr</th><th>Used</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+mR+'</tbody></table></div>':'')+'<div class="tb"><div><div style="font-size:11px;color:#93c5fd;margin-bottom:2px">Total Bill — '+ml+'</div><div style="font-size:26px;font-weight:800">₹'+tot.toFixed(2)+'</div><div style="font-size:10px;color:#60a5fa;margin-top:2px">Rent ₹'+rr.toFixed(2)+' + Water ₹'+wb.toFixed(2)+'</div></div><div style="font-size:30px;opacity:.25">'+(aP?'✅':'💳')+'</div></div>'+(!aP?'<div style="margin:12px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:11px;line-height:1.5;color:#92400e">💡 Please pay <b>₹'+tot.toFixed(2)+'</b> for <b>'+ml+'</b>.'+(tO>0?' Prev outstanding: <b>₹'+tO.toFixed(2)+'</b>':'')+'</div>':'')+(tO>0?'<div class="out"><div class="ot">⚠️ Previous Outstanding — ₹'+tO.toFixed(2)+'</div><table style="border:none"><thead><tr style="background:#fee2e2"><th style="text-align:left;padding-left:10px">Month</th><th style="text-align:right">Rent</th><th style="text-align:right">Water</th><th style="text-align:right">Due</th></tr></thead><tbody>'+oR+'</tbody><tfoot><tr style="background:#fee2e2;font-weight:700"><td style="padding:6px 10px;font-size:11px">Total</td><td colspan="2"></td><td style="padding:6px 10px;text-align:right;color:#991b1b;font-size:13px">₹'+tO.toFixed(2)+'</td></tr></tfoot></table></div>':'')+'<div class="ft">PropertyManager · '+date+'</div></div></body></html>';
+  var w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);toast('📄 Bill ready!');
+}
+function doXL(){
+  if(typeof XLSX==='undefined'){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=doXL;document.head.appendChild(s);toast('⏳ Loading…');return;}
+  var wb=XLSX.utils.book_new(),ms=allMs();
+  function H(v,bg){return{v:v,t:'s',s:{font:{bold:true,color:{rgb:'FFFFFF'},sz:10},fill:{fgColor:{rgb:bg||'1F3A5F'}},alignment:{horizontal:'center'}}};}
+  function T(v){return{v:v||'',t:'s',s:{font:{sz:10}}};}
+  function M(v){return{v:+v||0,t:'n',s:{numFmt:'#,##0.00',font:{color:{rgb:'166534'},sz:10},alignment:{horizontal:'right'}}};}
+  var rows=[[H('PROPERTY MANAGER BILLS','0F2744'),'','','','','','','',''],[''],
+    [H('Month'),H('Building'),H('Room'),H('Tenant'),H('Rent'),H('Water'),H('Total'),H('Rent Status'),H('Water Status')]];
+  ms.forEach(function(m){var sv=getMS(m);if(!sv)return;sv.buildings.forEach(function(b){b.rooms.forEach(function(r){var wb=r.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);var rr=+(r.rent||0),ps=gPS(r.id,m);rows.push([T(fmt(m)),T(b.name),T(r.name),T(r.tenant||''),M(rr),M(wb),M(rr+wb),T(ps.rent==='paid'?'✓ Paid':'✗ Unpaid'),T(ps.water==='paid'?'✓ Paid':'✗ Unpaid')]);});});rows.push([]);});
+  var ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:18},{wch:14},{wch:10},{wch:18},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}];XLSX.utils.book_append_sheet(wb,ws,'Bills');
+  XLSX.writeFile(wb,'PropManager_'+new Date().toISOString().slice(0,10)+'.xlsx');toast('✅ Excel downloaded!');
+}
+function doPDF(){
+  var ms=allMs();if(!ms.length){toast('No data');return;}
+  var now=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Property Report</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#000;background:#fff}.cov{padding:34px;text-align:center;page-break-after:always}.cov h1{font-size:22px;color:#1e3a5f}.ms{padding:14px 18px;page-break-after:always}.mt{background:#1e3a5f;color:#fff;padding:7px 13px;font-size:12px;font-weight:bold}.sr{display:flex;gap:7px;margin:9px 0}.sb{flex:1;border:1px solid #ddd;border-radius:4px;padding:7px;text-align:center}.v{font-size:14px;font-weight:bold;color:#1e3a5f}.l{font-size:9px;color:#666}table{width:100%;border-collapse:collapse;margin-bottom:11px;font-size:10px}th{background:#1e3a5f;color:#fff;padding:5px 6px;text-align:left}td{padding:4px 6px;border-bottom:1px solid #eee}.paid{color:#166534;font-weight:bold}.unpaid{color:#991b1b;font-weight:bold}.ra{text-align:right;font-weight:bold}.ft{font-size:9px;color:#aaa;text-align:center;padding:4px}@media print{.ms{page-break-after:always}}</style></head><body>';
+  html+='<div class="cov"><h1>🏢 Property Manager Report</h1><p>'+now+'</p></div>';
+  ms.forEach(function(m){var sv=getMS(m);if(!sv)return;var tR=0,tW=0,pc=0,uc=0;sv.buildings.forEach(function(b){b.rooms.forEach(function(r){var wb=r.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);tR+=(+r.rent||0);tW+=wb;var ps=gPS(r.id,m);if(ps.rent==='paid'&&ps.water==='paid')pc++;else uc++;});});html+='<div class="ms"><div class="mt">📅 '+fmt(m)+'</div><div class="sr"><div class="sb"><div class="v">₹'+(tR+tW).toFixed(2)+'</div><div class="l">Total</div></div><div class="sb"><div class="v">₹'+tR.toFixed(2)+'</div><div class="l">Rent</div></div><div class="sb"><div class="v">₹'+tW.toFixed(2)+'</div><div class="l">Water</div></div><div class="sb"><div class="v" style="color:#166534">'+pc+'</div><div class="l">Paid</div></div><div class="sb"><div class="v" style="color:#991b1b">'+uc+'</div><div class="l">Unpaid</div></div></div>';sv.buildings.forEach(function(b){html+='<div style="font-weight:bold;font-size:10px;color:#555;margin:7px 0 3px">🏢 '+b.name+'</div><table><thead><tr><th>Room</th><th>Tenant</th><th class="ra">Rent</th><th class="ra">Water</th><th class="ra">Total</th><th>Rent</th><th>Water</th></tr></thead><tbody>';b.rooms.forEach(function(r){var wb=r.meters.reduce(function(s,mt){var d=Math.max(0,(+mt.curr||0)-(+mt.last||0));return s+d*(+mt.rate||0);},0);var rr=+(r.rent||0),ps=gPS(r.id,m);html+='<tr><td>'+r.name+'</td><td>'+(r.tenant||'—')+'</td><td class="ra">₹'+rr.toFixed(2)+'</td><td class="ra">₹'+wb.toFixed(2)+'</td><td class="ra">₹'+(rr+wb).toFixed(2)+'</td><td class="'+(ps.rent==='paid'?'paid':'unpaid')+'">'+(ps.rent==='paid'?'✓ Paid':'✗ Unpaid')+'</td><td class="'+(ps.water==='paid'?'paid':'unpaid')+'">'+(ps.water==='paid'?'✓ Paid':'✗ Unpaid')+'</td></tr>';});html+='</tbody></table>';});html+='<div class="ft">PropertyManager · '+fmt(m)+'</div></div>';});
+  html+='</body></html>';
+  var w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},700);toast('📄 PDF ready');
+}
+// ── INIT ─────────────────────────────────────────
+(function(){
+  try{var st=localStorage.getItem('pm_s');if(st)S=JSON.parse(st);}catch(e){}
+  try{var py=localStorage.getItem('pm_p');if(py)PAY=JSON.parse(py);}catch(e){}
+  var now=new Date(),defM=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var m=localStorage.getItem('pm_month')||defM;
+  ge('MP').value=m;lastM=m;
+  try{var rd=localStorage.getItem('pm_r_'+m);if(rd){var r=JSON.parse(rd);S.buildings.forEach(function(b){b.rooms.forEach(function(rm){rm.meters.forEach(function(mt){var x=r[rm.id]&&r[rm.id][mt.id];mt.last=x?x.last:'';mt.curr=x?x.curr:'';});});});}}catch(e){}
+  renB();
+  if(S.buildings.length>0){var c=S.buildings.reduce(function(s,b){return s+b.rooms.length;},0);setTimeout(function(){toast('✅ Loaded: '+S.buildings.length+' buildings, '+c+' rooms');},400);}
+  // Start Firebase after UI loads
+  setTimeout(initFB, 500);
+})();
+</script>
+</body>
+</html>
